@@ -3,75 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UV-Vis Tauc Plotter & Bandgap Estimator</title>
+    <title>Advanced Tauc Plotter & Bandgap Estimator</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        body { background-color: #f4f6f9; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root {
+            --sidebar-width: 380px;
+            --primary-bg: #f8f9fa;
+            --accent-color: #4f46e5;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f3f4f6; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
         
-        /* Layout: Top Navbar + Main Content */
-        .main-container { flex: 1; display: flex; overflow: hidden; }
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .navbar-brand { font-weight: 600; letter-spacing: 0.5px; }
+
+        /* Main Layout */
+        .main-container { flex: 1; display: flex; overflow: hidden; position: relative; }
         
-        /* Sidebar: Fixed width, Flex column to handle pinned buttons */
+        /* Sidebar */
         .sidebar { 
-            width: 350px; 
-            min-width: 350px;
+            width: var(--sidebar-width); 
+            min-width: var(--sidebar-width);
             background: white; 
-            border-right: 1px solid #ddd; 
+            border-right: 1px solid #e2e8f0; 
             display: flex; 
             flex-direction: column; 
             height: 100%;
-            z-index: 10;
+            z-index: 20;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
         }
 
-        /* Sidebar Content: Scrollable area for inputs */
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        /* Sidebar Footer: Pinned to bottom */
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 25px; }
         .sidebar-footer {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            padding: 20px 25px;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
         }
 
         /* Plot Area */
         .plot-area { 
             flex: 1; 
-            background: #fff; 
+            background: #f3f4f6; 
             padding: 20px; 
             overflow-y: auto; 
             display: flex; 
             flex-direction: column; 
         }
 
-        /* Elements */
-        .card-header { font-weight: bold; font-size: 0.9rem; }
-        #plotDiv, #directPlotDiv, #indirectPlotDiv { width: 90%; aspect-ratio: 1/1; max-height: 60vh; margin: 20 auto; }
-        .results-table td, .results-table th { font-size: 0.85rem; padding: 4px 8px; }
-        .nav-tabs .nav-link.active { font-weight: bold; border-top: 3px solid #0d6efd; color: #0d6efd; background-color: #fff; border-bottom-color: transparent; }
+        /* Custom Cards */
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: white;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .card-header-custom {
+            background: transparent;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 15px;
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Plot Containers */
+        .plot-container-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        #plotDiv, #directPlotDiv, #indirectPlotDiv { flex: 1; width: 100%; }
+
+        /* Tables */
+        .table-custom th { background-color: #f8fafc; color: #64748b; font-weight: 600; font-size: 0.85rem; }
+        .table-custom td { font-size: 0.9rem; vertical-align: middle; }
+        .badge-eg { font-size: 0.9em; background-color: #eff6ff; color: #2563eb; padding: 5px 10px; border-radius: 6px; border: 1px solid #bfdbfe; }
+
+        /* Tabs */
+        .nav-tabs { border-bottom: none; margin-bottom: 15px; }
+        .nav-tabs .nav-link {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link:hover { background: #e2e8f0; color: #1e293b; }
+        .nav-tabs .nav-link.active {
+            background: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
         
-        /* Hide class utility */
+        .form-label { font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        .form-text { font-size: 0.75rem; color: #94a3b8; }
         .d-none-custom { display: none !important; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 flex-shrink-0">
+<nav class="navbar navbar-dark">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Bandgap Estimator <span style="font-size:0.7em; opacity:0.7;">UV-VIS Analysis Tool</span></span>
+        <span class="navbar-brand mb-0 h1">
+            <i class="bi bi-graph-up-arrow me-2"></i>Tauc Plotter 
+            <span style="font-size:0.7em; font-weight:300; opacity:0.8; margin-left:10px;">UV-Vis Analysis Suite</span>
+        </span>
+        <div class="text-white small opacity-75">v2.1</div>
     </div>
 </nav>
 
@@ -79,25 +149,31 @@
     
     <div class="sidebar">
         <div class="sidebar-content">
-            <h5 class="mb-3 text-primary">1. Data Import</h5>
-            <div class="mb-3">
-                <input class="form-control" type="file" id="fileInput" multiple accept=".csv, .txt, .dat">
-                <div class="form-text">Supports CSV/TXT (Space, Tab, or Comma separated).</div>
+            
+            <div class="card-custom">
+                <div class="card-header-custom"><i class="bi bi-folder2-open text-primary"></i> Data Import</div>
+                <div class="card-body p-3">
+                    <label class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-upload me-2"></i>Select CSV/TXT Files
+                        <input type="file" id="fileInput" multiple accept=".csv, .txt, .dat" hidden>
+                    </label>
+                    <div id="fileCount" class="text-center small text-muted">No files loaded</div>
+                </div>
             </div>
 
-            <div class="card mb-3">
-                <div class="card-header bg-light">Input Parameters</div>
-                <div class="card-body">
-                    <div class="row g-2 mb-2">
+            <div class="card-custom">
+                <div class="card-header-custom"><i class="bi bi-sliders text-primary"></i> Parameters</div>
+                <div class="card-body p-3">
+                    <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label class="form-label small">X-Axis Unit</label>
+                            <label class="form-label">X-Axis Unit</label>
                             <select id="xUnit" class="form-select form-select-sm" onchange="recalculateAll()">
                                 <option value="nm">Wavelength (nm)</option>
                                 <option value="ev">Energy (eV)</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <label class="form-label small">Y-Axis Type</label>
+                            <label class="form-label">Y-Axis Type</label>
                             <select id="yType" class="form-select form-select-sm" onchange="handleYTypeChange()">
                                 <option value="abs">Absorbance (A)</option>
                                 <option value="trans">Transmittance (%)</option>
@@ -108,122 +184,117 @@
                     
                     <div class="row g-2" id="thicknessGroup">
                          <div class="col-12">
-                            <label class="form-label small">Sample Thickness (cm)</label>
-                            <input type="number" id="thickness" class="form-control form-control-sm" value="1.0" step="0.0001" onchange="recalculateAll()">
-                            <div class="form-text" style="font-size: 0.75rem;">Required for α calculation (Abs/Trans modes).</div>
+                            <label class="form-label">Sample Thickness (cm)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" id="thickness" class="form-control" value="1.0" step="0.0001" onchange="recalculateAll()">
+                                <span class="input-group-text">cm</span>
+                            </div>
                          </div>
                     </div>
                 </div>
             </div>
 
-            <h5 class="mb-2 text-primary">2. Analysis Controls</h5>
-            <div class="card mb-3">
-                <div class="card-header bg-light">Linear Fit Range (Energy eV)</div>
-                <div class="card-body">
-                    <p class="small text-muted mb-2">Adjust range to select linear region for Eg fitting. <br><strong>Tip:</strong> If Eg is negative, increase Min eV.</p>
-                    <div class="input-group input-group-sm mb-2">
-                        <span class="input-group-text">Min eV</span>
-                        <input type="number" id="fitMin" class="form-control" step="0.1" onchange="recalculateAll()">
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <i class="bi bi-ruler text-primary"></i> Linear Fit Range
+                    <button class="btn btn-link btn-sm ms-auto p-0" onclick="autoDetectRange()" title="Auto Detect"><i class="bi bi-magic"></i></button>
+                </div>
+                <div class="card-body p-3">
+                    <p class="small text-muted mb-2">Set the Energy (eV) range to calculate the slope.</p>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Min eV</label>
+                            <input type="number" id="fitMin" class="form-control form-control-sm" step="0.1" onchange="recalculateAll()">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Max eV</label>
+                            <input type="number" id="fitMax" class="form-control form-control-sm" step="0.1" onchange="recalculateAll()">
+                        </div>
                     </div>
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text">Max eV</span>
-                        <input type="number" id="fitMax" class="form-control" step="0.1" onchange="recalculateAll()">
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary w-100 mt-2" onclick="autoDetectRange()">Auto-Suggest Range</button>
                 </div>
             </div>
         </div>
 
         <div class="sidebar-footer">
             <div class="d-grid gap-2">
-                <button id="btnDownload" class="btn btn-success" disabled onclick="downloadCSV()">Download CSV</button>
-                <button id="btnReport" class="btn btn-primary" disabled onclick="generatePDF()">Generate PDF Report</button>
+                <button id="btnDownload" class="btn btn-success shadow-sm" disabled onclick="downloadCSV()">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>Download CSV
+                </button>
+                <button id="btnReport" class="btn btn-primary shadow-sm" disabled onclick="generatePDF()">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Generate Report
+                </button>
             </div>
         </div>
     </div>
 
     <div class="plot-area">
-        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="raw-tab" data-bs-toggle="tab" data-bs-target="#raw" type="button">Raw Spectra</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="direct-tab" data-bs-toggle="tab" data-bs-target="#direct" type="button">Direct Bandgap</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="indirect-tab" data-bs-toggle="tab" data-bs-target="#indirect" type="button">Indirect Bandgap</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="help-tab" data-bs-toggle="tab" data-bs-target="#help" type="button">Help & Theory</button>
-            </li>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#raw">Raw Spectra</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#direct">Direct Bandgap</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#indirect">Indirect Bandgap</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#help"><i class="bi bi-question-circle"></i></button></li>
         </ul>
 
         <div class="tab-content h-100" id="myTabContent">
-            <div class="tab-pane fade show active" id="raw" role="tabpanel">
-                <div id="plotDiv"></div>
-            </div>
-
-            <div class="tab-pane fade" id="direct" role="tabpanel">
-                <div id="directPlotDiv"></div>
-                <div class="mt-3">
-                    <h6>Calculated Results (Direct)</h6>
-                    <table class="table table-bordered table-sm results-table" id="directTable">
-                        <thead class="table-light"><tr><th>File</th><th>Eg (eV)</th><th>R²</th><th>Slope</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+            
+            <div class="tab-pane fade show active h-100" id="raw">
+                <div class="plot-container-wrapper">
+                    <div id="plotDiv"></div>
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="indirect" role="tabpanel">
-                <div id="indirectPlotDiv"></div>
-                <div class="mt-3">
-                    <h6>Calculated Results (Indirect)</h6>
-                    <table class="table table-bordered table-sm results-table" id="indirectTable">
-                        <thead class="table-light"><tr><th>File</th><th>Eg (eV)</th><th>R²</th><th>Slope</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+            <div class="tab-pane fade h-100" id="direct">
+                <div class="plot-container-wrapper mb-3" style="height: 65%;">
+                    <div id="directPlotDiv"></div>
+                </div>
+                <div class="card-custom">
+                    <div class="card-body p-0">
+                        <table class="table table-custom table-hover mb-0" id="directTable">
+                            <thead><tr><th>File</th><th>Eg (eV)</th><th>R²</th><th>Slope</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="help" role="tabpanel">
-                <div class="p-4" style="max-width: 800px;">
-                    <h4 class="mb-3">Theory & Operation</h4>
+            <div class="tab-pane fade h-100" id="indirect">
+                <div class="plot-container-wrapper mb-3" style="height: 65%;">
+                    <div id="indirectPlotDiv"></div>
+                </div>
+                <div class="card-custom">
+                    <div class="card-body p-0">
+                        <table class="table table-custom table-hover mb-0" id="indirectTable">
+                            <thead><tr><th>File</th><th>Eg (eV)</th><th>R²</th><th>Slope</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="help">
+                <div class="card-custom p-4" style="max-width: 800px; margin: 0 auto;">
+                    <h4 class="mb-4 text-primary">Theory & Operation</h4>
                     
-                    <h5 class="mt-4">1. Absorbance & Transmittance Mode</h5>
-                    <p>For standard transmission measurements (liquids/films), the Tauc plot is based on the Absorption Coefficient (<b>&alpha;</b>).</p>
+                    <h5 class="mt-2">1. Absorbance & Transmittance Mode</h5>
+                    <p class="text-muted">Calculates Absorption Coefficient (<b>&alpha;</b>) for films/liquids.</p>
                     <ul>
-                        <li>If input is <strong>Transmittance (%T)</strong>: 
-                            <br><code>A = 2 - log<sub>10</sub>(%T)</code>
-                        </li>
-                        <li><strong>Absorption Coefficient (&alpha;):</strong> 
-                            <br><code>&alpha; = (2.303 &times; A) / d</code> 
-                            <br>where <em>d</em> is the <strong>sample thickness</strong> in cm.
-                        </li>
+                        <li>Input <strong>%T</strong>: <code>A = 2 - log<sub>10</sub>(%T)</code></li>
+                        <li><strong>&alpha;:</strong> <code>&alpha; = (2.303 &times; A) / d</code> (d = thickness cm)</li>
                     </ul>
 
                     <h5 class="mt-4">2. Reflectance Mode (Kubelka-Munk)</h5>
-                    <p>For diffuse reflectance (powders/opaque samples), the code uses the <strong>Kubelka-Munk function F(R)</strong>. This method does <u>not</u> depend on thickness.</p>
+                    <p class="text-muted">Calculates <strong>F(R)</strong> for powders/diffuse surfaces.</p>
                     <ul>
-                        <li>The reflectance <em>R</em> is normalized (0 &lt; R &lt; 1): 
-                            <br><code>R<sub>norm</sub> = R<sub>%</sub> / 100</code>
-                        </li>
-                        <li><strong>Kubelka-Munk Function:</strong> 
-                            <br><code>F(R) = (1 - R<sub>norm</sub>)<sup>2</sup> / (2 &times; R<sub>norm</sub>)</code>
-                        </li>
+                        <li><strong>F(R):</strong> <code>F(R) = (1 - R)<sup>2</sup> / (2 &times; R)</code> (Where R is 0-1)</li>
                     </ul>
 
-                    <h5 class="mt-4">3. Plot Y-Axis Logic</h5>
-                    <ul>
-                        <li><strong>Direct Bandgap:</strong> Plot fits <code>(Y &times; h&nu;)<sup>2</sup></code> vs Energy.</li>
-                        <li><strong>Indirect Bandgap:</strong> Plot fits <code>(Y &times; h&nu;)<sup>0.5</sup></code> vs Energy.</li>
-                        <li><em>(Where Y is either &alpha; or F(R) depending on the mode selected)</em>.</li>
-                    </ul>
-
-                    
+                    <h5 class="mt-4">3. Tauc Equations</h5>
+                    <div class="alert alert-light border">
+                        <strong>Direct:</strong> <code>(Y &cdot; h&nu;)<sup>2</sup> = A(h&nu; - Eg)</code><br>
+                        <strong>Indirect:</strong> <code>(Y &cdot; h&nu;)<sup>0.5</sup> = B(h&nu; - Eg)</code>
+                    </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 </div>
@@ -232,7 +303,8 @@
     // --- Global State ---
     let datasets = []; 
     const fileInput = document.getElementById('fileInput');
-    
+    const colorPalette = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#0891b2', '#db2777'];
+
     // --- Event Listeners ---
     fileInput.addEventListener('change', handleFiles);
 
@@ -240,8 +312,6 @@
     function handleYTypeChange() {
         const yType = document.getElementById('yType').value;
         const thicknessGroup = document.getElementById('thicknessGroup');
-        
-        // Hide Thickness for Reflectance, Show for Abs/Trans
         if (yType === 'refl') {
             thicknessGroup.classList.add('d-none-custom');
         } else {
@@ -256,17 +326,20 @@
         if (!files.length) return;
 
         datasets = []; 
+        document.getElementById('fileCount').textContent = `Loading ${files.length} files...`;
+        
         let filesLoaded = 0;
 
-        Array.from(files).forEach(file => {
+        Array.from(files).forEach((file, index) => {
             Papa.parse(file, {
                 delimiter: "", 
                 skipEmptyLines: true,
                 dynamicTyping: true,
                 complete: function(results) {
-                    processRawData(file.name, results.data);
+                    processRawData(file.name, results.data, index);
                     filesLoaded++;
                     if (filesLoaded === files.length) {
+                        document.getElementById('fileCount').textContent = `${filesLoaded} files loaded`;
                         smartDetectParams(); 
                         autoDetectRange();   
                     }
@@ -275,7 +348,7 @@
         });
     }
 
-    function processRawData(filename, data) {
+    function processRawData(filename, data, index) {
         let cleanData = data.filter(row => {
             return row.length >= 2 && typeof row[0] === 'number' && typeof row[1] === 'number';
         });
@@ -287,7 +360,9 @@
         const rawY = cleanData.map(r => r[1]);
 
         datasets.push({
+            id: index,
             name: filename,
+            color: colorPalette[index % colorPalette.length],
             rawX: rawX,
             rawY: rawY,
             eV: [], alphaOrF: [], directY: [], indirectY: [],
@@ -308,14 +383,12 @@
         // Detect Y Type
         const maxY = Math.max(...d.rawY);
         const ySelect = document.getElementById('yType');
-        
-        // Heuristic: If Y > 5, likely % (Trans/Refl). If < 4, likely Abs.
         if (maxY > 5) {
-            ySelect.value = 'refl'; // Default to refl for high values
+            ySelect.value = 'refl'; 
         } else {
             ySelect.value = 'abs';
         }
-        handleYTypeChange(); // Update UI visibility based on guess
+        handleYTypeChange();
     }
 
     function autoDetectRange() {
@@ -330,8 +403,8 @@
         const minE = Math.min(...allEv);
         const maxE = Math.max(...allEv);
         
-        // Default fit range: Top 40% of energy spectrum
-        document.getElementById('fitMin').value = (minE + (maxE - minE) * 0.5).toFixed(2);
+        // Default fit range: Top 30% of energy spectrum usually contains the edge
+        document.getElementById('fitMin').value = (minE + (maxE - minE) * 0.6).toFixed(2);
         document.getElementById('fitMax').value = maxE.toFixed(2);
 
         recalculateAll();
@@ -349,7 +422,6 @@
 
         if (!thickness || thickness <= 0) thickness = 1.0; 
 
-        // Enable buttons
         document.getElementById('btnDownload').disabled = false;
         document.getElementById('btnReport').disabled = false;
 
@@ -368,42 +440,30 @@
                 ds.eV.push(energy);
 
                 // 2. Process Y based on mode
-                let valForTauc = 0; // Will be alpha or F(R)
+                let valForTauc = 0; 
 
                 if (yType === 'refl') {
-                    // --- Kubelka-Munk Mode ---
-                    // R is %, convert to 0-1
                     let R = y / 100;
-                    // Clamp to avoid division by zero or negative logs
                     if (R <= 0.0001) R = 0.0001; 
                     if (R >= 1) R = 0.9999;
-                    
-                    // F(R) = (1-R)^2 / 2R
                     valForTauc = Math.pow(1 - R, 2) / (2 * R);
-                    
                 } else {
-                    // --- Standard Abs/Trans Mode ---
                     let A = 0;
                     if (yType === 'abs') {
                         A = y;
                     } else if (yType === 'trans') {
-                        // T is %, A = 2 - log(T)
                         let T = y;
                         if (T <= 0.0001) T = 0.0001;
                         A = 2 - Math.log10(T);
                     }
                     if (A < 0) A = 0;
-
-                    // Calculate Alpha (cm^-1)
                     valForTauc = (2.303 * A) / thickness;
                 }
 
                 ds.alphaOrF.push(valForTauc);
 
                 // 3. Tauc Y-axes
-                // Direct: (val * hv)^2
                 ds.directY.push(Math.pow(valForTauc * energy, 2));
-                // Indirect: (val * hv)^1/2
                 ds.indirectY.push(Math.pow(valForTauc * energy, 0.5));
             }
 
@@ -432,7 +492,7 @@
             }
         }
 
-        if (n < 2) return { m: 0, c: 0, Eg: 0, R2: 0 };
+        if (n < 2) return { m: 0, c: 0, Eg: 0, R2: 0, valid: false };
 
         const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
         const intercept = (sumY - slope * sumX) / n;
@@ -445,85 +505,111 @@
             ssTot += Math.pow(p.y - yMean, 2);
             ssRes += Math.pow(p.y - yPred, 2);
         });
-        const R2 = 1 - (ssRes / ssTot);
+        const R2 = ssTot === 0 ? 0 : 1 - (ssRes / ssTot); // Avoid div by zero
 
-        const Eg = -intercept / slope;
+        let Eg = 0;
+        // Avoid dividing by zero slope
+        if (Math.abs(slope) > 1e-9) {
+            Eg = -intercept / slope;
+        }
 
-        return { m: slope, c: intercept, Eg: Eg, R2: R2 };
+        return { m: slope, c: intercept, Eg: Eg, R2: R2, valid: true, minXFit: minX, maxXFit: maxX };
     }
-
-
-    
 
     function updatePlots() {
         const yType = document.getElementById('yType').value;
         const yLabelBase = (yType === 'refl') ? 'F(R)' : 'α';
-        
+        const fitMin = parseFloat(document.getElementById('fitMin').value);
+        const fitMax = parseFloat(document.getElementById('fitMax').value);
+
         const layoutCommon = {
-            margin: { t: 40, r: 20, l: 60, b: 60 },
+            margin: { t: 40, r: 20, l: 60, b: 50 },
             showlegend: true,
-            legend: { x: 0.05, y: 0.95 },
-            // Autosize is true by default, but relying on CSS aspect-ratio requires 'responsive' config below
+            legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(255,255,255,0.8)' },
+            plot_bgcolor: "white",
+            paper_bgcolor: "white",
+            xaxis: { showgrid: true, gridcolor: '#f1f5f9', zeroline: true, zerolinecolor: '#cbd5e1' },
+            yaxis: { showgrid: true, gridcolor: '#f1f5f9', zeroline: true, zerolinecolor: '#cbd5e1' },
+            font: { family: 'Inter, sans-serif' }
         };
 
-        const configCommon = { responsive: true }; //  update with container size
+        const configCommon = { responsive: true, displaylogo: false };
 
         // 1. Raw Spectra
         const rawTraces = datasets.map(ds => ({
             x: ds.rawX,
             y: ds.rawY,
             mode: 'lines',
-            name: ds.name
+            name: ds.name,
+            line: { color: ds.color, width: 2 }
         }));
         
         const xLab = document.getElementById('xUnit').value === 'nm' ? 'Wavelength (nm)' : 'Energy (eV)';
-        
-        // Define Y-Label based on selection
         let yLabRaw = "Value"; 
         if (yType === 'abs') yLabRaw = "Absorbance (a.u.)";
         else if (yType === 'trans') yLabRaw = "Transmittance (%)";
         else if (yType === 'refl') yLabRaw = "Reflectance (%)";
 
         Plotly.newPlot('plotDiv', rawTraces, 
-            { ...layoutCommon, title: 'Raw Spectra', xaxis: {title: xLab}, yaxis: {title: yLabRaw} }, 
+            { ...layoutCommon, title: 'Raw Spectra', xaxis: { ...layoutCommon.xaxis, title: xLab}, yaxis: { ...layoutCommon.yaxis, title: yLabRaw} }, 
             configCommon
         );
 
+        // Helper to generate fit traces (The Split Line Logic)
+        const createFitTraces = (ds, yDataArr, fitObj, yLabel) => {
+            let traces = [];
+            // Data Trace
+            traces.push({ 
+                x: ds.eV, 
+                y: yDataArr, 
+                mode: 'lines', 
+                name: ds.name, 
+                line: {width: 2, color: ds.color, opacity: 0.6} 
+            });
 
+            if (fitObj.valid && fitObj.m !== 0) {
+                // 1. The Extrapolation Line (Thin, Dashed, from Eg to minFit)
+                const xExtra = [fitObj.Eg, fitObj.minXFit];
+                const yExtra = [0, fitObj.m * fitObj.minXFit + fitObj.c];
+                
+                traces.push({ 
+                    x: xExtra, y: yExtra, mode: 'lines', 
+                    name: `Extrap. (${ds.name})`,
+                    showlegend: false,
+                    line: { dash: 'dash', width: 1, color: 'black' },
+                    hoverinfo: 'skip'
+                });
+
+                // 2. The Active Fit Line (Thick, Solid, from minFit to maxFit)
+                const xActive = [fitObj.minXFit, fitObj.maxXFit];
+                const yActive = [fitObj.m * fitObj.minXFit + fitObj.c, fitObj.m * fitObj.maxXFit + fitObj.c];
+
+                traces.push({ 
+                    x: xActive, y: yActive, mode: 'lines', 
+                    name: `Fit Eg=${fitObj.Eg.toFixed(2)}`,
+                    line: { dash: 'solid', width: 4, color: 'red' } // Thicker line requested
+                });
+            }
+            return traces;
+        };
 
         // 2. Direct Plot
         let directTraces = [];
         datasets.forEach(ds => {
-            directTraces.push({ x: ds.eV, y: ds.directY, mode: 'lines', name: ds.name, line: {width: 2} });
-            if (ds.fitDirect.m !== 0) {
-                const fitX = [ds.fitDirect.Eg, Math.max(...ds.eV)];
-                const fitY = [0, ds.fitDirect.m * Math.max(...ds.eV) + ds.fitDirect.c];
-                directTraces.push({ 
-                    x: fitX, y: fitY, mode: 'lines', name: `Fit (Eg=${ds.fitDirect.Eg.toFixed(2)})`,
-                    line: { dash: 'dot', width: 1, color: 'orange' } 
-                });
-            }
+            directTraces.push(...createFitTraces(ds, ds.directY, ds.fitDirect, `(${yLabelBase}hν)²`));
         });
         Plotly.newPlot('directPlotDiv', directTraces, 
-            { ...layoutCommon, title: `Direct Bandgap: (${yLabelBase}hν)² vs Energy`, xaxis: {title: 'Energy (eV)'}, yaxis: {title: `(${yLabelBase}hν)²`} }, 
+            { ...layoutCommon, title: 'Direct Bandgap', xaxis: { ...layoutCommon.xaxis, title: 'Energy (eV)'}, yaxis: { ...layoutCommon.yaxis, title: `(${yLabelBase}hν)²`} }, 
             configCommon
         );
 
         // 3. Indirect Plot
         let indirectTraces = [];
         datasets.forEach(ds => {
-            indirectTraces.push({ x: ds.eV, y: ds.indirectY, mode: 'lines', name: ds.name, line: {width: 2} });
-            if (ds.fitIndirect.m !== 0) {
-                const fitX = [ds.fitIndirect.Eg, Math.max(...ds.eV)];
-                const fitY = [0, ds.fitIndirect.m * Math.max(...ds.eV) + ds.fitIndirect.c];
-                indirectTraces.push({ 
-                    x: fitX, y: fitY, mode: 'lines', name: `Fit (Eg=${ds.fitIndirect.Eg.toFixed(2)})`,
-                    line: { dash: 'dot', width: 1, color: 'orange' } 
-                });
-            }
+            indirectTraces.push(...createFitTraces(ds, ds.indirectY, ds.fitIndirect, `(${yLabelBase}hν)½`));
         });
         Plotly.newPlot('indirectPlotDiv', indirectTraces, 
-            { ...layoutCommon, title: `Indirect Bandgap: (${yLabelBase}hν)½ vs Energy`, xaxis: {title: 'Energy (eV)'}, yaxis: {title: `(${yLabelBase}hν)½`} }, 
+            { ...layoutCommon, title: 'Indirect Bandgap', xaxis: { ...layoutCommon.xaxis, title: 'Energy (eV)'}, yaxis: { ...layoutCommon.yaxis, title: `(${yLabelBase}hν)½`} }, 
             configCommon
         );
     }
@@ -535,7 +621,11 @@
             datasets.forEach(ds => {
                 const fit = ds[key];
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${ds.name}</td><td><strong>${fit.Eg.toFixed(3)}</strong></td><td>${fit.R2.toFixed(4)}</td><td>${fit.m.toExponential(2)}</td>`;
+                tr.innerHTML = `
+                    <td><span style="color:${ds.color}">●</span> ${ds.name}</td>
+                    <td><span class="badge-eg">${fit.Eg.toFixed(3)} eV</span></td>
+                    <td>${fit.R2.toFixed(4)}</td>
+                    <td class="text-muted small">${fit.m.toExponential(2)}</td>`;
                 tbody.appendChild(tr);
             });
         };
@@ -545,12 +635,8 @@
 
     // --- Export Functions ---
     function downloadCSV() {
-        if (!datasets || datasets.length === 0) {
-            alert("No data available to download.");
-            return;
-        }
+        if (!datasets || datasets.length === 0) return;
         
-        // Helper to safely format cells (handles commas in filenames)
         const esc = (val) => {
             if (val === null || val === undefined) return "";
             const str = String(val);
@@ -558,84 +644,41 @@
         };
 
         let rows = [];
-
-        // --- SECTION 1: SUMMARY OF RESULTS ---
         rows.push(["=== SUMMARY RESULTS ==="]);
         rows.push(["File Name", "Bandgap Mode", "Eg (eV)", "R-Squared", "Slope", "Intercept"].join(","));
 
         datasets.forEach(ds => {
-            // Add Direct Bandgap Result
-            rows.push([
-                esc(ds.name), 
-                "Direct (n=2)", 
-                ds.fitDirect.Eg.toFixed(4), 
-                ds.fitDirect.R2.toFixed(4), 
-                ds.fitDirect.m.toExponential(4),
-                ds.fitDirect.c.toExponential(4)
-            ].join(","));
-            
-            // Add Indirect Bandgap Result
-            rows.push([
-                esc(ds.name), 
-                "Indirect (n=1/2)", 
-                ds.fitIndirect.Eg.toFixed(4), 
-                ds.fitIndirect.R2.toFixed(4), 
-                ds.fitIndirect.m.toExponential(4),
-                ds.fitIndirect.c.toExponential(4)
-            ].join(","));
+            rows.push([esc(ds.name), "Direct (n=2)", ds.fitDirect.Eg.toFixed(4), ds.fitDirect.R2.toFixed(4), ds.fitDirect.m.toExponential(4), ds.fitDirect.c.toExponential(4)].join(","));
+            rows.push([esc(ds.name), "Indirect (n=1/2)", ds.fitIndirect.Eg.toFixed(4), ds.fitIndirect.R2.toFixed(4), ds.fitIndirect.m.toExponential(4), ds.fitIndirect.c.toExponential(4)].join(","));
         });
 
-        rows.push([]); // Spacer row
-        rows.push([]); 
-        rows.push(["=== SPECTRAL DATA ==="]);
-
-        // --- SECTION 2: FULL DATA TABLE ---
-        // 1. Build Headers
+        rows.push([], [], ["=== SPECTRAL DATA ==="]);
         let dataHeader = ["Index"];
         datasets.forEach(ds => {
             const n = esc(ds.name);
-            dataHeader.push(`${n}_Energy(eV)`);
-            dataHeader.push(`${n}_RawInput`);
-            dataHeader.push(`${n}_Processed_Y(Alpha_or_F(R))`);
-            dataHeader.push(`${n}_Direct_Tauc_Y`);
-            dataHeader.push(`${n}_Indirect_Tauc_Y`);
+            dataHeader.push(`${n}_eV`, `${n}_Raw`, `${n}_ProcessedY`, `${n}_DirectY`, `${n}_IndirectY`);
         });
         rows.push(dataHeader.join(","));
 
-        // 2. Build Data Rows
         const maxLen = Math.max(...datasets.map(d => d.eV.length));
-
         for (let i = 0; i < maxLen; i++) {
             let row = [i];
             datasets.forEach(ds => {
                 if (i < ds.eV.length) {
-                    // Precision fixed to 5 decimals to keep file size reasonable but accurate
-                    row.push(ds.eV[i].toFixed(5));
-                    row.push(ds.rawY[i].toFixed(5));
-                    // Handle potential undefined for processed arrays
-                    row.push(ds.alphaOrF && ds.alphaOrF[i] !== undefined ? ds.alphaOrF[i].toFixed(5) : "");
-                    row.push(ds.directY && ds.directY[i] !== undefined ? ds.directY[i].toFixed(5) : "");
-                    row.push(ds.indirectY && ds.indirectY[i] !== undefined ? ds.indirectY[i].toFixed(5) : "");
+                    row.push(ds.eV[i].toFixed(5), ds.rawY[i].toFixed(5), ds.alphaOrF[i].toFixed(5), ds.directY[i].toFixed(5), ds.indirectY[i].toFixed(5));
                 } else {
-                    // Empty cells if this file has fewer points than the longest file
                     row.push("","","","","");
                 }
             });
             rows.push(row.join(","));
         }
 
-        // --- CREATE BLOB & DOWNLOAD ---
-        const csvString = rows.join("\r\n");
-        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([rows.join("\r\n")], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        
         const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `tauc_analysis_full_${Date.now()}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
+        link.href = url;
+        link.download = `tauc_analysis_${Date.now()}.csv`;
         link.click();
-        document.body.removeChild(link);
     }
 
     async function generatePDF() {
@@ -644,55 +687,67 @@
         const date = new Date().toLocaleString();
         const yType = document.getElementById('yType').value;
 
-        doc.setFontSize(16);
-        doc.text("UV-VIS Tauc Plot Report", 14, 20);
-        doc.setFontSize(10);
-        doc.text(`Generated: ${date}`, 14, 26);
-        doc.text(`Analysis Mode: ${yType.toUpperCase()}`, 14, 32);
+        // Header
+        doc.setFillColor(30, 41, 59); // Dark Blue
+        doc.rect(0, 0, 210, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.text("Tauc Plot Analysis Report", 14, 13);
         
-        if (yType !== 'refl') {
-            doc.text(`Thickness Used: ${document.getElementById('thickness').value} cm`, 14, 38);
-        } else {
-            doc.text(`Thickness: N/A (Kubelka-Munk)`, 14, 38);
-        }
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${date}`, 14, 30);
+        doc.text(`Mode: ${yType.toUpperCase()}`, 14, 35);
 
-        let yPos = 46;
+        let yPos = 45;
         const addTableToPdf = (title, tableId) => {
-            doc.setFontSize(12);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
             doc.text(title, 14, yPos);
             yPos += 7;
-            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
             
             const table = document.getElementById(tableId);
             const rows = table.querySelectorAll('tr');
-            rows.forEach(row => {
+            
+            // Header Row
+            doc.setFillColor(241, 245, 249);
+            doc.rect(14, yPos - 4, 180, 6, 'F');
+            
+            rows.forEach((row, idx) => {
                 let xPos = 14;
                 const cols = row.querySelectorAll('th, td');
-                let rowText = "";
-                cols.forEach(col => { rowText += col.innerText.padEnd(25, " ").substring(0, 25) + " "; });
-                doc.text(rowText, xPos, yPos);
-                yPos += 5;
+                cols.forEach((col, cIdx) => { 
+                    // Simple column spacing
+                    let txt = col.innerText.trim();
+                    doc.text(txt, xPos, yPos);
+                    xPos += (cIdx === 0) ? 80 : 35; // First col wider
+                });
+                yPos += 6;
             });
             yPos += 10;
         };
 
-        addTableToPdf("Direct Bandgap Results:", "directTable");
-        addTableToPdf("Indirect Bandgap Results:", "indirectTable");
+        addTableToPdf("Direct Bandgap Results", "directTable");
+        addTableToPdf("Indirect Bandgap Results", "indirectTable");
 
-        // Grab plot images
         const grabPlot = async (divId) => {
-            return await Plotly.toImage(document.getElementById(divId), {format: 'png', width: 600, height: 400});
+            return await Plotly.toImage(document.getElementById(divId), {format: 'png', width: 800, height: 500, scale: 2});
         };
 
-        if (yPos > 200) { doc.addPage(); yPos = 20; }
+        if (yPos > 180) { doc.addPage(); yPos = 20; }
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("Direct Tauc Plot", 14, yPos);
         const imgDirect = await grabPlot('directPlotDiv');
-        doc.text("Direct Tauc Plot:", 14, yPos);
-        doc.addImage(imgDirect, 'PNG', 15, yPos + 5, 180, 100);
+        doc.addImage(imgDirect, 'PNG', 15, yPos + 5, 180, 110);
         
         doc.addPage();
-        doc.text("Indirect Tauc Plot:", 14, 20);
+        doc.text("Indirect Tauc Plot", 14, 20);
         const imgIndirect = await grabPlot('indirectPlotDiv');
-        doc.addImage(imgIndirect, 'PNG', 15, 25, 180, 100);
+        doc.addImage(imgIndirect, 'PNG', 15, 25, 180, 110);
 
         doc.save(`Tauc_Report_${Date.now()}.pdf`);
     }
