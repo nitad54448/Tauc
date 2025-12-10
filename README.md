@@ -3,6 +3,7 @@
 A lightweight, single-file web application for analyzing UV-Vis spectroscopic data and estimating optical bandgaps ($E_g$) using the Tauc method. 
 
 Built with **JavaScript** and **Plotly**, this tool runs entirely in your web browser with no installation required. It supports both standard Absorbance/Transmittance data and Diffuse Reflectance (Kubelka-Munk) analysis.
+You can download it from here or look at nitad54448.github.io
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Web-orange.svg)
