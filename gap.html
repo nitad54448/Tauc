@@ -123,7 +123,7 @@
         }
         .nav-tabs .nav-link:hover { background: #e2e8f0; color: #1e293b; }
         .nav-tabs .nav-link.active {
-            background: #4f46e5;
+            background: #2563eb;
             color: white;
             box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
         }
@@ -139,7 +139,7 @@
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">
             <i class="bi bi-graph-up-arrow me-2"></i>Tauc Plotter 
-            <span style="font-size:0.7em; font-weight:300; opacity:0.8; margin-left:10px;">UV-Vis Analysis Suite</span>
+            <span style="font-size:0.7em; font-weight:300; opacity:0.8; margin-left:10px;">UV-Vis Analysis</span>
         </span>
         <div class="text-white small opacity-75">v2.1</div>
     </div>
@@ -174,30 +174,32 @@
                         </div>
                         <div class="col-6">
                             <label class="form-label">Y-Axis Type</label>
+
                             <select id="yType" class="form-select form-select-sm" onchange="handleYTypeChange()">
-                                <option value="abs">Absorbance (A)</option>
-                                <option value="trans">Transmittance (%)</option>
-                                <option value="refl">Reflectance (%)</option>
-                            </select>
+    <option value="refl" selected>Reflectance (%)</option>
+    <option value="abs">Absorbance (A)</option>
+    <option value="trans">Transmittance (%)</option>
+</select>
                         </div>
                     </div>
                     
-                    <div class="row g-2" id="thicknessGroup">
-                         <div class="col-12">
-                            <label class="form-label">Sample Thickness (cm)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" id="thickness" class="form-control" value="1.0" step="0.0001" onchange="recalculateAll()">
-                                <span class="input-group-text">cm</span>
-                            </div>
-                         </div>
-                    </div>
+<div class="row g-2 d-none-custom" id="thicknessGroup">
+     <div class="col-12">
+        <label class="form-label">Sample Thickness (cm)</label>
+        <div class="input-group input-group-sm">
+            <input type="number" id="thickness" class="form-control" value="1.0" step="0.0001" onchange="recalculateAll()">
+            <span class="input-group-text">cm</span>
+        </div>
+     </div>
+</div>
+
                 </div>
             </div>
 
             <div class="card-custom">
                 <div class="card-header-custom">
                     <i class="bi bi-ruler text-primary"></i> Linear Fit Range
-                    <button class="btn btn-link btn-sm ms-auto p-0" onclick="autoDetectRange()" title="Auto Detect"><i class="bi bi-magic"></i></button>
+                    <button class="btn btn-link btn-sm ms-auto p-0" onclick="autoDetectRange()" title="Auto Detect"><i class="bi bi-magic fs-5"></i></button>
                 </div>
                 <div class="card-body p-3">
                     <p class="small text-muted mb-2">Set the Energy (eV) range to calculate the slope.</p>
@@ -232,7 +234,7 @@
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#raw">Raw Spectra</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#direct">Direct Bandgap</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#indirect">Indirect Bandgap</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#help"><i class="bi bi-question-circle"></i></button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#help"><i class="bi bi-question-circle fs-5"></i></button></li>
         </ul>
 
         <div class="tab-content h-100" id="myTabContent">
@@ -273,26 +275,28 @@
 
             <div class="tab-pane fade" id="help">
                 <div class="card-custom p-4" style="max-width: 800px; margin: 0 auto;">
-                    <h4 class="mb-4 text-primary">Theory & Operation</h4>
+                    <h4 class="mb-4 text-primary">Equations</h4>
                     
-                    <h5 class="mt-2">1. Absorbance & Transmittance Mode</h5>
+                    <h5 class="mt-2"> Absorbance & Transmittance Mode</h5>
                     <p class="text-muted">Calculates Absorption Coefficient (<b>&alpha;</b>) for films/liquids.</p>
                     <ul>
                         <li>Input <strong>%T</strong>: <code>A = 2 - log<sub>10</sub>(%T)</code></li>
                         <li><strong>&alpha;:</strong> <code>&alpha; = (2.303 &times; A) / d</code> (d = thickness cm)</li>
                     </ul>
 
-                    <h5 class="mt-4">2. Reflectance Mode (Kubelka-Munk)</h5>
+                    <h5 class="mt-4"> Reflectance Mode (Kubelka-Munk)</h5>
                     <p class="text-muted">Calculates <strong>F(R)</strong> for powders/diffuse surfaces.</p>
                     <ul>
                         <li><strong>F(R):</strong> <code>F(R) = (1 - R)<sup>2</sup> / (2 &times; R)</code> (Where R is 0-1)</li>
                     </ul>
 
-                    <h5 class="mt-4">3. Tauc Equations</h5>
+                    <h5 class="mt-4"> Tauc Equations</h5>
+
                     <div class="alert alert-light border">
-                        <strong>Direct:</strong> <code>(Y &cdot; h&nu;)<sup>2</sup> = A(h&nu; - Eg)</code><br>
-                        <strong>Indirect:</strong> <code>(Y &cdot; h&nu;)<sup>0.5</sup> = B(h&nu; - Eg)</code>
-                    </div>
+    <strong>Direct:</strong> <code>(Y &middot; h&nu;)<sup>2</sup> = A(h&nu; - E<sub>g</sub>)</code><br>
+    <strong>Indirect:</strong> <code>(Y &middot; h&nu;)<sup>0.5</sup> = B(h&nu; - E<sub>g</sub>)</code>
+</div>
+                    <h6>version 2.1, December 11, 2025</h6>
                 </div>
             </div>
         </div>
