@@ -154,10 +154,10 @@
                 <div class="card-header-custom"><i class="bi bi-folder2-open text-primary"></i> Data Import</div>
                 <div class="card-body p-3">
                     <label class="btn btn-outline-primary w-100 mb-2">
-                        <i class="bi bi-upload me-2"></i>Select CSV/TXT Files
-                        <input type="file" id="fileInput" multiple accept=".csv, .txt, .dat" hidden>
-                    </label>
-                    <div id="fileCount" class="text-center small text-muted">No files loaded</div>
+    <i class="bi bi-upload me-2"></i>Select CSV/TXT Files
+    <input type="file" id="fileInput" multiple accept=".csv, .txt, .dat" hidden>
+</label>
+
                 </div>
             </div>
 
@@ -199,21 +199,30 @@
             <div class="card-custom">
                 <div class="card-header-custom">
                     <i class="bi bi-ruler text-primary"></i> Linear Fit Range
-                    <button class="btn btn-link btn-sm ms-auto p-0" onclick="autoDetectRange()" title="Auto Detect"><i class="bi bi-magic fs-5"></i></button>
+                    <button class="btn btn-link btn-sm ms-auto p-0" onclick="autoDetectRange()" title="Auto Detect"><i class="bi bi-magic fs-6"></i></button>
                 </div>
+
                 <div class="card-body p-3">
-                    <p class="small text-muted mb-2">Set the Energy (eV) range to calculate the slope.</p>
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label">Min eV</label>
-                            <input type="number" id="fitMin" class="form-control form-control-sm" step="0.1" onchange="recalculateAll()">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Max eV</label>
-                            <input type="number" id="fitMax" class="form-control form-control-sm" step="0.1" onchange="recalculateAll()">
-                        </div>
-                    </div>
-                </div>
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <label class="form-label">Min eV</label>
+                <span id="lblMin" class="badge bg-light text-dark border">0.00</span>
+            </div>
+            <input type="range" id="fitMin" class="form-range" step="0.01" 
+                   oninput="updateSliderLabel('lblMin', this.value); recalculateAll()">
+        </div>
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <label class="form-label">Max eV</label>
+                <span id="lblMax" class="badge bg-light text-dark border">0.00</span>
+            </div>
+            <input type="range" id="fitMax" class="form-range" step="0.01" 
+                   oninput="updateSliderLabel('lblMax', this.value); recalculateAll()">
+        </div>
+    </div>
+</div>
+
             </div>
         </div>
 
@@ -234,7 +243,7 @@
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#raw">Raw Spectra</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#direct">Direct Bandgap</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#indirect">Indirect Bandgap</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#help"><i class="bi bi-question-circle fs-5"></i></button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#help"><i class="bi bi-question-circle fs-6"></i></button></li>
         </ul>
 
         <div class="tab-content h-100" id="myTabContent">
@@ -273,32 +282,48 @@
                 </div>
             </div>
 
+
             <div class="tab-pane fade" id="help">
-                <div class="card-custom p-4" style="max-width: 800px; margin: 0 auto;">
-                    <h4 class="mb-4 text-primary">Equations</h4>
-                    
-                    <h5 class="mt-2"> Absorbance & Transmittance Mode</h5>
-                    <p class="text-muted">Calculates Absorption Coefficient (<b>&alpha;</b>) for films/liquids.</p>
-                    <ul>
-                        <li>Input <strong>%T</strong>: <code>A = 2 - log<sub>10</sub>(%T)</code></li>
-                        <li><strong>&alpha;:</strong> <code>&alpha; = (2.303 &times; A) / d</code> (d = thickness cm)</li>
-                    </ul>
+    <div class="card-custom p-4" style="max-width: 800px; margin: 0 auto;">
+        <h4 class="mb-4 text-primary">Help & Documentation</h4>
+        
+        <h5 class="mt-2"><i class="bi bi-file-earmark-text"></i> Data Import</h5>
+        <p class="text-muted">You can upload <strong>.csv</strong>, <strong>.txt</strong>, or <strong>.dat</strong> files.</p>
+        <ul class="small text-muted">
+            <li><strong>Structure:</strong> Files should contain two columns (X and Y).</li>
+            <li><strong>Delimiters:</strong> Comma, space, or tab separated values are supported.</li>
+            <li><strong>Headers:</strong> Non-numeric headers are automatically detected and skipped.</li>
+            <li><strong>Order:</strong> Data does not need to be sorted; the tool will sort by Energy/Wavelength automatically.</li>
+        </ul>
+        <hr class="my-4">
 
-                    <h5 class="mt-4"> Reflectance Mode (Kubelka-Munk)</h5>
-                    <p class="text-muted">Calculates <strong>F(R)</strong> for powders/diffuse surfaces.</p>
-                    <ul>
-                        <li><strong>F(R):</strong> <code>F(R) = (1 - R)<sup>2</sup> / (2 &times; R)</code> (Where R is 0-1)</li>
-                    </ul>
+        <h5 class="mt-2"> Absorbance & Transmittance Mode</h5>
+        <p class="text-muted">Calculates Absorption Coefficient (<b>&alpha;</b>) for films/liquids.</p>
+        <ul>
+            <li>Input <strong>%T</strong>: <code>A = 2 - log<sub>10</sub>(%T)</code></li>
+            <li><strong>&alpha;:</strong> <code>&alpha; = (2.303 &times; A) / d</code> (d = thickness cm)</li>
+        </ul>
 
-                    <h5 class="mt-4"> Tauc Equations</h5>
+        <h5 class="mt-4"> Reflectance Mode (Kubelka-Munk)</h5>
+        <p class="text-muted">Calculates <strong>F(R)</strong> for powders/diffuse surfaces.</p>
+        <ul>
+            <li><strong>F(R):</strong> <code>F(R) = (1 - R)<sup>2</sup> / (2 &times; R)</code> (Where R is normalized 0-1)</li>
+        </ul>
 
-                    <div class="alert alert-light border">
-    <strong>Direct:</strong> <code>(Y &middot; h&nu;)<sup>2</sup> = A(h&nu; - E<sub>g</sub>)</code><br>
-    <strong>Indirect:</strong> <code>(Y &middot; h&nu;)<sup>0.5</sup> = B(h&nu; - E<sub>g</sub>)</code>
+        <h5 class="mt-4"> Tauc Equations</h5>
+        <div class="alert alert-light border">
+            <strong>Direct:</strong> <code>(Y &middot; h&nu;)<sup>2</sup> = A(h&nu; - E<sub>g</sub>)</code><br>
+            <strong>Indirect:</strong> <code>(Y &middot; h&nu;)<sup>0.5</sup> = B(h&nu; - E<sub>g</sub>)</code>
+        </div>
+
+        <h5 class="mt-4"><i class="bi bi-magic"></i> Auto-Detect Range</h5>
+        <p class="text-muted">The "Magic Wand" automatically sets the linear fit boundaries to the top 40% of the energy spectrum, targeting the high-energy region where the fundamental absorption edge is typically located.</p>
+
+        <h6 class="mt-6 text-end text-muted opacity-50">version 2.2, December 11, 2025</h6>
+    </div>
 </div>
-                    <h6>version 2.1, December 11, 2025</h6>
-                </div>
-            </div>
+
+
         </div>
     </div>
 </div>
@@ -311,6 +336,18 @@
 
     // --- Event Listeners ---
     fileInput.addEventListener('change', handleFiles);
+
+    // --- Tab Handling for Plot Resizing ---
+    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabEls.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            // Trigger resize on all plots to ensure they fit the container
+            Plotly.Plots.resize(document.getElementById('plotDiv'));
+            Plotly.Plots.resize(document.getElementById('directPlotDiv'));
+            Plotly.Plots.resize(document.getElementById('indirectPlotDiv'));
+        });
+    });
+
 
     // --- UI Logic ---
     function handleYTypeChange() {
@@ -330,7 +367,7 @@
         if (!files.length) return;
 
         datasets = []; 
-        document.getElementById('fileCount').textContent = `Loading ${files.length} files...`;
+    //    document.getElementById('fileCount').textContent = `Loading ${files.length} files...`;
         
         let filesLoaded = 0;
 
@@ -343,7 +380,7 @@
                     processRawData(file.name, results.data, index);
                     filesLoaded++;
                     if (filesLoaded === files.length) {
-                        document.getElementById('fileCount').textContent = `${filesLoaded} files loaded`;
+     //                   document.getElementById('fileCount').textContent = `${filesLoaded} files loaded`;
                         smartDetectParams(); 
                         autoDetectRange();   
                     }
@@ -351,6 +388,11 @@
             });
         });
     }
+
+function updateSliderLabel(labelId, val) {
+        document.getElementById(labelId).textContent = parseFloat(val).toFixed(2);
+    }
+
 
     function processRawData(filename, data, index) {
         let cleanData = data.filter(row => {
@@ -404,12 +446,30 @@
             allEv.push(isNm ? 1239.84 / x : x);
         });
 
-        const minE = Math.min(...allEv);
-        const maxE = Math.max(...allEv);
+        // 1. Calculate Limits from Data
+        const minData = Math.min(...allEv);
+        const maxData = Math.max(...allEv);
         
-        // Default fit range: Top 30% of energy spectrum usually contains the edge
-        document.getElementById('fitMin').value = (minE + (maxE - minE) * 0.6).toFixed(2);
-        document.getElementById('fitMax').value = maxE.toFixed(2);
+        // 2. Configure Sliders Dynamic Range
+        const sMin = document.getElementById('fitMin');
+        const sMax = document.getElementById('fitMax');
+
+        // Allow sliders to go slightly beyond data for ease of use, or stick strictly to data
+        sMin.min = minData.toFixed(2);
+        sMin.max = maxData.toFixed(2);
+        sMax.min = minData.toFixed(2);
+        sMax.max = maxData.toFixed(2);
+
+        // 3. Set Default Fit Values (Top 40%)
+        const defaultMin = (minData + (maxData - minData) * 0.6).toFixed(2);
+        const defaultMax = maxData.toFixed(2);
+
+        sMin.value = defaultMin;
+        sMax.value = defaultMax;
+
+        // 4. Update Visual Labels
+        updateSliderLabel('lblMin', defaultMin);
+        updateSliderLabel('lblMax', defaultMax);
 
         recalculateAll();
     }
@@ -480,6 +540,7 @@
         updateTables();
     }
 
+
     function performLinearFit(xData, yData, minX, maxX) {
         let n = 0;
         let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
@@ -496,12 +557,13 @@
             }
         }
 
-        if (n < 2) return { m: 0, c: 0, Eg: 0, R2: 0, valid: false };
+        if (n < 3) return { m: 0, c: 0, Eg: 0, EgErr: 0, R2: 0, valid: false };
 
         const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
         const intercept = (sumY - slope * sumX) / n;
+        const meanX = sumX / n;
 
-        // R2 Calc
+        // Stats for Error and R2
         let ssTot = 0, ssRes = 0;
         const yMean = sumY / n;
         validPoints.forEach(p => {
@@ -509,15 +571,21 @@
             ssTot += Math.pow(p.y - yMean, 2);
             ssRes += Math.pow(p.y - yPred, 2);
         });
-        const R2 = ssTot === 0 ? 0 : 1 - (ssRes / ssTot); // Avoid div by zero
-
-        let Eg = 0;
-        // Avoid dividing by zero slope
+        
+        const R2 = ssTot === 0 ? 0 : 1 - (ssRes / ssTot);
+        
+        let Eg = 0, EgErr = 0;
         if (Math.abs(slope) > 1e-9) {
             Eg = -intercept / slope;
+            
+            // Standard Error of the X-intercept
+            const syx = Math.sqrt(ssRes / (n - 2)); // Std Err of Estimate
+            const Sxx = sumXX - (sumX * sumX) / n;
+            // Formula for SE of x-intercept
+            EgErr = (syx / Math.abs(slope)) * Math.sqrt(1/n + Math.pow(meanX - Eg, 2)/Sxx);
         }
 
-        return { m: slope, c: intercept, Eg: Eg, R2: R2, valid: true, minXFit: minX, maxXFit: maxX };
+        return { m: slope, c: intercept, Eg: Eg, EgErr: EgErr, R2: R2, valid: true, minXFit: minX, maxXFit: maxX };
     }
 
     function updatePlots() {
@@ -685,76 +753,111 @@
         link.click();
     }
 
+
     async function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const date = new Date().toLocaleString();
         const yType = document.getElementById('yType').value;
+        const fileNames = datasets.map(d => d.name).join(', ');
+        const currentURL = window.location.href;
 
-        // Header
-        doc.setFillColor(30, 41, 59); // Dark Blue
-        doc.rect(0, 0, 210, 20, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(14);
-        doc.text("Tauc Plot Analysis Report", 14, 13);
+
+
+
+        // --- Header Section ---
+        doc.setFillColor(30, 41, 59); 
+        doc.rect(0, 0, 210, 38, 'F'); // Adjusted height for consistent spacing
         
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.text("Tauc Plot Analysis Report", 14, 11);
+        
+        // File Names
         doc.setFontSize(10);
-        doc.text(`Generated: ${date}`, 14, 30);
-        doc.text(`Mode: ${yType.toUpperCase()}`, 14, 35);
+        doc.setFont(undefined, 'normal');
+        doc.text("Datafile:", 14, 20);
+        
+        // Truncate if too long
+        let fText = fileNames.length > 90 ? fileNames.substring(0, 87) + "..." : fileNames;
+        doc.text(fText, 30, 20);
 
-        let yPos = 45;
-        const addTableToPdf = (title, tableId) => {
+        // Generated & URL (Consistent 6-unit vertical spacing: 20 -> 26 -> 32)
+        doc.text(`Generated: ${date}`, 14, 26);
+        doc.text(`Source: ${currentURL}`, 14, 32);
+
+        // Reset Text for Body
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(0, 0, 0);
+        let yPos = 50; // Moved down slightly to clear the header
+
+
+
+
+        // --- Custom Table Function (No Filename, Includes Error) ---
+        const addResultsTable = (title, key) => {
             doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.text(title, 14, yPos);
             yPos += 7;
-            doc.setFont(undefined, 'normal');
             doc.setFontSize(9);
-            
-            const table = document.getElementById(tableId);
-            const rows = table.querySelectorAll('tr');
-            
-            // Header Row
+            doc.setFont(undefined, 'normal');
+
+            // Table Header
             doc.setFillColor(241, 245, 249);
             doc.rect(14, yPos - 4, 180, 6, 'F');
-            
-            rows.forEach((row, idx) => {
-                let xPos = 14;
-                const cols = row.querySelectorAll('th, td');
-                cols.forEach((col, cIdx) => { 
-                    // Simple column spacing
-                    let txt = col.innerText.trim();
-                    doc.text(txt, xPos, yPos);
-                    xPos += (cIdx === 0) ? 80 : 35; // First col wider
-                });
+            doc.text("Eg (eV)", 16, yPos);
+            doc.text("Error (±)", 50, yPos);
+            doc.text("R-Squared", 90, yPos);
+            doc.text("Slope", 130, yPos);
+            yPos += 6;
+
+            // Rows
+            datasets.forEach(ds => {
+                const fit = ds[key];
+                doc.text(`${fit.Eg.toFixed(3)} eV`, 16, yPos);
+                doc.text(`± ${fit.EgErr.toFixed(3)}`, 50, yPos);
+                doc.text(`${fit.R2.toFixed(4)}`, 90, yPos);
+                doc.text(`${fit.m.toExponential(2)}`, 130, yPos);
                 yPos += 6;
             });
-            yPos += 10;
+            yPos += 8; // Spacer
         };
 
-        addTableToPdf("Direct Bandgap Results", "directTable");
-        addTableToPdf("Indirect Bandgap Results", "indirectTable");
+        // --- Render Tables ---
+        addResultsTable("Direct Bandgap Results", "fitDirect");
+        addResultsTable("Indirect Bandgap Results", "fitIndirect");
 
+        // --- Helper for Images ---
         const grabPlot = async (divId) => {
-            return await Plotly.toImage(document.getElementById(divId), {format: 'png', width: 800, height: 500, scale: 2});
+            return await Plotly.toImage(document.getElementById(divId), {format: 'png', width: 800, height: 400, scale: 2});
         };
 
-        if (yPos > 180) { doc.addPage(); yPos = 20; }
-        
+        // --- Render Plots ---
+        // Ensure we have space, else new page
+        if (yPos > 120) { doc.addPage(); yPos = 20; }
+
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
-        doc.text("Direct Tauc Plot", 14, yPos);
+        doc.text(" Raw Spectrum", 14, yPos);
+        const imgRaw = await grabPlot('plotDiv');
+        doc.addImage(imgRaw, 'PNG', 15, yPos + 5, 180, 80);
+        yPos += 95;
+
+        if (yPos > 200) { doc.addPage(); yPos = 20; }
+        
+        doc.text(" Direct Tauc Plot", 14, yPos);
         const imgDirect = await grabPlot('directPlotDiv');
-        doc.addImage(imgDirect, 'PNG', 15, yPos + 5, 180, 110);
+        doc.addImage(imgDirect, 'PNG', 15, yPos + 5, 180, 80);
         
         doc.addPage();
-        doc.text("Indirect Tauc Plot", 14, 20);
+        doc.text(" Indirect Tauc Plot", 14, 20);
         const imgIndirect = await grabPlot('indirectPlotDiv');
-        doc.addImage(imgIndirect, 'PNG', 15, 25, 180, 110);
+        doc.addImage(imgIndirect, 'PNG', 15, 25, 180, 80);
 
         doc.save(`Tauc_Report_${Date.now()}.pdf`);
     }
+
 </script>
 
 </body>
