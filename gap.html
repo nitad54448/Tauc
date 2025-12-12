@@ -358,7 +358,8 @@
                 <div class="card-custom p-4 mt-3" style="max-width: 800px; margin: 0 auto;">
                     <h4 class="mb-4 text-primary"><i class="bi bi-book me-2"></i>Documentation & Math</h4>
                     
-                    <h5 class="mt-2 text-dark"><i class="bi bi-1-circle me-2"></i>Multi-File Workflow</h5>
+
+                    <h5 class="mt-2 text-dark">Multi-File Workflow</h5>
                     <p class="text-muted small">This tool allows you to analyze multiple datasets simultaneously.</p>
                     <ul class="small text-muted">
                         <li><strong>Import:</strong> Upload one or multiple .csv/.txt files at once with Add Files or by drag and drop.</li>
@@ -367,6 +368,16 @@
                         <li><strong>Compare:</strong> Use the checkboxes in the File List to hide/show specific plots.</li>
                     </ul>
                     <hr class="my-4">
+
+                    <h5 class="mt-2 text-dark">Data</h5>
+                    <p class="text-muted small">Data can be exported in several ways.</p>
+                    <ul class="small text-muted">
+                        <li><strong>CSV:</strong> Raw spectra and caalculated Tauc plot can be saved as CSV with the <em>Download CSV</em> button.</li>
+                        <li><strong>Report:</strong> The <em>PDF Report</em> will save a timestamped PDF file with all the graph and the calculations results.</li>
+                        <li><strong>Plots:</strong> Plots can be zoomed in or out and they can be saved as PNG files; see the utilities icons in the top right part of the chart.</li>
+                    </ul>
+                    <hr class="my-4">
+
 
                     <h5 class="mt-2 text-dark">Absorbance & Transmittance Mode</h5>
                     <p class="text-muted small">Calculates Absorption Coefficient (<b>&alpha;</b>) for films or liquids.</p>
@@ -881,15 +892,43 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         const createFitTraces = (ds, yDataArr, fitObj) => {
-            let traces = [];
-            traces.push({ x: ds.calc.eV, y: yDataArr, mode: 'lines', name: ds.name, line: {width: 2, color: ds.color, opacity: 0.5}, showlegend: true });
+    let traces = [];
+    
+    // 1. Experimental Data
+    traces.push({ 
+        x: ds.calc.eV, 
+        y: yDataArr, 
+        mode: 'lines', 
+        name: ds.name, 
+        line: { width: 2, color: ds.color, opacity: 0.5 }, 
+        showlegend: true,
+        // Shows x and y with 3 significant digits
+        hovertemplate: '%{x:.3g}, %{y:.3g}<extra></extra>' 
+    });
 
-            if (fitObj.valid && fitObj.m !== 0) {
-                traces.push({ x: [fitObj.Eg, fitObj.minXFit], y: [0, fitObj.m * fitObj.minXFit + fitObj.c], mode: 'lines', showlegend: false, line: { dash: 'dash', width: 1, color: '#333' }, hoverinfo: 'skip' });
-                traces.push({ x: [fitObj.minXFit, fitObj.maxXFit], y: [fitObj.m * fitObj.minXFit + fitObj.c, fitObj.m * fitObj.maxXFit + fitObj.c], mode: 'lines', name: `Fit ${ds.name} (Eg=${fitObj.Eg.toFixed(2)})`, line: { dash: 'solid', width: 3, color: ds.color } });
-            }
-            return traces;
-        };
+    if (fitObj.valid && fitObj.m !== 0) {
+        // 2. Dashed Extrapolation (No hover needed)
+        traces.push({ 
+            x: [fitObj.Eg, fitObj.minXFit], 
+            y: [0, fitObj.m * fitObj.minXFit + fitObj.c], 
+            mode: 'lines', 
+            showlegend: false, 
+            line: { dash: 'dash', width: 1, color: '#333' }, 
+            hoverinfo: 'skip' 
+        });
+
+        // 3. Linear Fit (Thick, Pale, Limited Digits)
+        traces.unshift({ 
+            x: [fitObj.minXFit, fitObj.maxXFit], 
+            y: [fitObj.m * fitObj.minXFit + fitObj.c, fitObj.m * fitObj.maxXFit + fitObj.c], 
+            mode: 'lines', 
+            name: `Fit ${ds.name} (Eg=${fitObj.Eg.toFixed(2)})`, 
+            line: { dash: 'solid', width: 3, color: ds.color, opacity: 0.25 },
+            hovertemplate: 'Fit: %{y:.3g}<extra></extra>'
+        });
+    }
+    return traces;
+};
 
         let directTraces = [];
         visibleDS.forEach(ds => directTraces.push(...createFitTraces(ds, ds.calc.directY, ds.calc.fitDirect)));
