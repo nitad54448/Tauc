@@ -1,0 +1,6 @@
+
+a[href*="github.com"][href*="edit"],
+a[href*="github.com"][href*="blob"],
+.github-link {
+    display: none !important;
+}

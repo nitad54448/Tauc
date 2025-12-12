@@ -1,3 +1,0 @@
-# Disable the "Edit" link
-github:
-  is_project_page: false
