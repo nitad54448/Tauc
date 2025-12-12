@@ -878,13 +878,15 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (t === 'trans') rawYTitle = "Transmittance (%)";
         }
 
-        const rawTraces = visibleDS.map(ds => ({
-            x: ds.rawX,
-            y: ds.rawY,
-            mode: 'lines',
-            name: ds.name,
-            line: { color: ds.color, width: 2 }
-        }));
+const rawTraces = visibleDS.map(ds => ({
+    x: ds.rawX,
+    y: ds.rawY,
+    mode: 'lines',
+    name: ds.name,
+    line: { color: ds.color, width: 2 },
+    // 3 digits
+    hovertemplate: '%{x:.3g}, %{y:.3g}<extra></extra>'
+}));
         
         Plotly.react('plotDiv', rawTraces, 
             { ...layoutCommon, title: 'Raw Spectra', xaxis: { ...layoutCommon.xaxis, title: rawXTitle }, yaxis: { ...layoutCommon.yaxis, title: rawYTitle } }, 
